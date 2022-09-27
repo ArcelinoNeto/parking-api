@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2022_09_27_151845) do
     t.string "plate"
     t.string "entry"
     t.string "exit"
+    t.integer "status"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

@@ -4,6 +4,7 @@ class CreateReservations < ActiveRecord::Migration[6.1]
       t.string :plate
       t.string :entry
       t.string :exit
+      t.integer :status
 
       t.timestamps
     end

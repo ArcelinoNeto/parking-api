@@ -1,1 +1,1 @@
-# API to manage a parking lot
+# API in development

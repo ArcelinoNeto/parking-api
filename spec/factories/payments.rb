@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :payment do
-    value { "MyString" }
-    reservation { nil }
+    value { "10.25" }
+    association(:reservation)
   end
 end

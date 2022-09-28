@@ -58,7 +58,7 @@ RSpec.describe "Reservations", type: :request do
                 post url, params: reservation_invalid_params
                 expect(response).to have_http_status(:unprocessable_entity)
             end
-        end        
+        end
     end
     
     context "PATCH /reservations/:id" do
@@ -72,7 +72,7 @@ RSpec.describe "Reservations", type: :request do
             it 'updates Reservation' do
                 patch url, params: reservation_params
                 reservation.reload
-                # expect(reservation.plate).to eq new_plate
+                expect(reservation.plate).to eq new_plate
             end
 
             it 'returns updated Reservation' do
@@ -104,6 +104,27 @@ RSpec.describe "Reservations", type: :request do
                 patch url, params: reservation_invalid_params
                 # expect(response).to have_http_status(:unprocessable_entity)
             end
+        end
+    end
+
+    context "DELETE /reservations/:id" do
+        let!(:reservation) { create(:reservation) }
+        let(:url) { "/reservations/#{reservation.id}" }
+
+        it 'removes Reservation' do
+            expect do  
+              delete url
+            end.to change(Reservation, :count).by(-1)
+        end
+
+        it 'returns success status' do
+            delete url
+            expect(response).to have_http_status(:no_content)
+        end
+
+        it 'does not return any body content' do
+            delete url
+            expect(body_json).to_not be_present
         end
     end
 end

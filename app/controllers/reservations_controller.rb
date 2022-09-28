@@ -6,6 +6,10 @@ class ReservationsController < ApplicationController
 
         render json: @reservations
     end
+
+    def show
+        render json: @reservation
+    end
     
     def create
         @reservation = Reservation.new(reservation_params)
@@ -25,6 +29,9 @@ class ReservationsController < ApplicationController
         end
     end
     
+    def destroy
+        @reservation.destroy
+    end
 
     private
     

@@ -1,34 +1,46 @@
 # Parking API
 
-API em Rails para controle simples de estacionamento. O projeto gerencia reservas de veiculos e pagamentos associados a essas reservas.
+Parking API is a Ruby on Rails backend application designed to manage parking reservations, vehicle stays and payments.
 
-## Dominio
+The project was initially created as a backend study/challenge and later maintained as a portfolio project focused on RESTful API design, relational modeling and business rule organization.
+
+## Features
+
+* Parking reservation management
+* Vehicle entry and exit control
+* Reservation status tracking
+* Payment management
+* RESTful API structure
+* PostgreSQL database
+* Automated tests with RSpec
+
+## Domain
 
 ### Reservation
 
-Representa a reserva ou permanencia de um veiculo no estacionamento.
+Represents a vehicle reservation or stay in the parking lot.
 
-Campos principais:
+Main fields:
 
-- `plate`: placa do veiculo.
-- `entry`: data/hora de entrada.
-- `exit`: data/hora de saida.
-- `status`: estado da reserva.
+* `plate`: vehicle license plate
+* `entry`: vehicle entry date/time
+* `exit`: vehicle exit date/time
+* `status`: reservation status
 
-Status disponiveis:
+Available statuses:
 
-- `active`: reserva em andamento.
-- `finished`: reserva finalizada.
-- `cancelled`: reserva cancelada.
+* `active`: reservation in progress
+* `finished`: reservation completed
+* `cancelled`: reservation cancelled
 
 ### Payment
 
-Representa um pagamento feito para uma reserva.
+Represents a payment associated with a reservation.
 
-Campos principais:
+Main fields:
 
-- `value`: valor pago.
-- `reservation_id`: reserva vinculada ao pagamento.
+* `value`: paid amount
+* `reservation_id`: related reservation
 
 ## Endpoints
 
@@ -42,7 +54,7 @@ PATCH  /reservations/:id
 DELETE /reservations/:id
 ```
 
-Exemplo de criacao:
+Example request:
 
 ```json
 {
@@ -65,7 +77,7 @@ PATCH  /payments/:id
 DELETE /payments/:id
 ```
 
-Exemplo de criacao:
+Example request:
 
 ```json
 {
@@ -76,51 +88,77 @@ Exemplo de criacao:
 }
 ```
 
-## Requisitos
+## Tech Stack
 
-- Ruby 2.7.1
-- Rails 6.1
-- PostgreSQL
-
-O projeto possui `.ruby-version` e `Gemfile` apontando para Ruby 2.7.1.
+* Ruby 2.7.1
+* Ruby on Rails 6.1
+* PostgreSQL
+* RSpec
 
 ## Setup
 
-Instale as dependencias:
+Clone the repository:
+
+```bash
+git clone https://github.com/ArcelinoNeto/parking-api.git
+cd parking-api
+```
+
+Install dependencies:
 
 ```bash
 bundle install
 ```
 
-Prepare o banco:
+Create and migrate the database:
 
 ```bash
 bin/rails db:create
 bin/rails db:migrate
 ```
 
-Rode a API:
+Start the application:
 
 ```bash
 bin/rails server
 ```
 
-Por padrao, a aplicacao sobe em:
+By default, the API will be available at:
 
 ```text
 http://localhost:3000
 ```
 
-## Testes
+## Running Tests
 
 ```bash
 bundle exec rspec
 ```
 
-## Proximos passos sugeridos
+## Project Goals
 
-- Adicionar calculo automatico do valor da estadia.
-- Validar formato da placa.
-- Criar endpoints especificos para entrada e saida de veiculos.
-- Adicionar serializers para padronizar as respostas JSON.
-- Atualizar a stack para uma versao mais recente de Ruby/Rails.
+This project demonstrates:
+
+* RESTful API development with Ruby on Rails
+* Relational modeling between reservations and payments
+* Basic parking business rules
+* JSON API structure
+* Automated test execution with RSpec
+* Backend organization using Rails conventions
+
+## Future Improvements
+
+Some planned improvements for the project include:
+
+* Automatic parking fee calculation
+* License plate format validation
+* Specific endpoints for vehicle entry and exit
+* JSON serializers for response standardization
+* Authentication and authorization
+* Docker support
+* CI/CD pipeline
+* Upgrade to a newer Ruby and Rails version
+
+## Portfolio Notes
+
+Although this project started as a simple backend challenge, it was kept as a portfolio case because it represents common API scenarios involving reservations, statuses, payments and relational data management.

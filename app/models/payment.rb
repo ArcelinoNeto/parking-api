@@ -1,4 +1,5 @@
 class Payment < ApplicationRecord
-  validates_presence_of :value
   belongs_to :reservation
+
+  validates :value, presence: true, numericality: { greater_than: 0 }
 end

@@ -1,130 +1,142 @@
 require 'rails_helper'
 
 RSpec.describe "Payments", type: :request do
+  context "GET /payments" do
+    let(:url) { "/payments" }
+    let!(:payments) { create_list(:payment, 5) }
 
-    context "GET /payments" do
-        let(:url) { "/payments" } 
-        let(:payments) { create_list(:payment, 5) } 
+    it "returns all payments" do
+      get url
 
-        it "returns all Reservatios" do
-            get url
-
-            expected_payments = payments[0..4].as_json(only: %i(id value))
-            expect(payments[0..4].as_json(only: %i(id value))).to match_array expected_payments
-        end
-        
-        it "return sucess status" do 
-            get url
-            expect(response).to have_http_status(:ok)
-        end 
+      expect(body_json.size).to eq payments.size
+      expect(body_json.map { |payment| payment["id"] }).to match_array payments.map(&:id)
     end
 
-    context "POST /payments" do
-        let(:url) { "/payments" } 
+    it "returns success status" do
+      get url
 
-        context "with valid params" do
-            let(:payment_params) {{ payment: attributes_for(:payment).as_json }.to_json }
+      expect(response).to have_http_status(:ok)
+    end
+  end
 
-            it "adds a new Payment" do
-                # expect do
-                #     post url, params: payment_params
-                # end.to change(Reservation, :count).by(1)
-            end
+  context "POST /payments" do
+    let(:url) { "/payments" }
+    let(:reservation) { create(:reservation) }
 
-            it 'returns last added Payment' do
-                post url, params: payment_params
-                expected_payment = Payment.last.as_json                
-                expect(body_json['payment']).to eq expected_payment
-            end
-            
-            it 'returns success status' do
-                post url, params: payment_params
-                # expect(response).to have_http_status(:created)
-            end
-        end
+    context "with valid params" do
+      let(:payment_params) do
+        { payment: attributes_for(:payment).merge(reservation_id: reservation.id) }
+      end
 
-        context "with invalid params" do
-            let(:payment_invalid_params) do 
-                { payment: attributes_for(:payment, plate: nil) }.to_json
-            end
-            
-            it 'does not add a new Reservation' do
-                expect do
-                    post url, params: payment_invalid_params
-                end.to_not change(Payment, :count)
-            end
+      it "adds a new payment" do
+        expect do
+          post url, params: payment_params
+        end.to change(Payment, :count).by(1)
+      end
 
-            it 'returns unprocessable_entity status' do
-                post url, params: payment_invalid_params
-                expect(response).to have_http_status(:unprocessable_entity)
-            end
-        end
+      it "returns last added payment" do
+        post url, params: payment_params
+
+        expect(body_json["id"]).to eq Payment.last.id
+        expect(body_json["reservation_id"]).to eq reservation.id
+        expect(BigDecimal(body_json["value"].to_s)).to eq Payment.last.value
+      end
+
+      it "returns created status" do
+        post url, params: payment_params
+
+        expect(response).to have_http_status(:created)
+      end
     end
 
-    context "PATCH /payments/:id" do
-        let(:payment) { create(:payment) }
-        let(:url) { "/payments/#{payment.id}" }
+    context "with invalid params" do
+      let(:payment_invalid_params) do
+        { payment: attributes_for(:payment, value: nil).merge(reservation_id: reservation.id) }
+      end
 
-        context "with valid params" do
-            let(:new_value) { '10.25' }
-            let(:payment_params) { { payment: { value: new_value } }.to_json }
+      it "does not add a new payment" do
+        expect do
+          post url, params: payment_invalid_params
+        end.not_to change(Payment, :count)
+      end
 
-            it 'updates Payment' do
-                patch url, params: payment_params
-                payment.reload
-                expect(payment.value).to eq new_value
-            end
+      it "returns unprocessable entity status" do
+        post url, params: payment_invalid_params
 
-            it 'returns updated Payment' do
-                patch url, params: payment_params
-                payment.reload
-                expected_payment = payment.as_json
-                expect(payment.as_json).to eq expected_payment
-            end
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
 
-            it 'returns success status' do
-                patch url, params: payment_params
-                expect(response).to have_http_status(:ok)
-            end
-        end
-        
-        context "with invalid params" do
-            let(:payment_invalid_params) do 
-              { payment: attributes_for(:payment, plate: nil) }.to_json
-            end
+  context "PATCH /payments/:id" do
+    let(:payment) { create(:payment) }
+    let(:url) { "/payments/#{payment.id}" }
 
-            it 'does not update Payment' do
-                old_value = payment.value
-                patch url, params: payment_invalid_params
-                payment.reload
-                expect(payment.value).to eq old_value
-            end
+    context "with valid params" do
+      let(:new_value) { BigDecimal("15.75") }
+      let(:payment_params) { { payment: { value: new_value } } }
 
-            it 'returns unprocessable_entity status' do
-                patch url, params: payment_invalid_params
-                # expect(response).to have_http_status(:unprocessable_entity)
-            end
-        end
+      it "updates payment" do
+        patch url, params: payment_params
+
+        expect(payment.reload.value).to eq new_value
+      end
+
+      it "returns updated payment" do
+        patch url, params: payment_params
+
+        expect(body_json["id"]).to eq payment.id
+        expect(BigDecimal(body_json["value"].to_s)).to eq new_value
+      end
+
+      it "returns success status" do
+        patch url, params: payment_params
+
+        expect(response).to have_http_status(:ok)
+      end
     end
 
-    context "DELETE /payments/:id" do
-        let!(:payment) { create(:payment) }
-        let(:url) { "/payments/#{payment.id}" }
+    context "with invalid params" do
+      let(:payment_invalid_params) do
+        { payment: attributes_for(:payment, value: nil) }
+      end
 
-        it 'removes Payment' do
-            expect do  
-              delete url
-            end.to change(Payment, :count).by(-1)
-        end
+      it "does not update payment" do
+        old_value = payment.value
 
-        it 'returns success status' do
-            delete url
-            expect(response).to have_http_status(:no_content)
-        end
+        patch url, params: payment_invalid_params
 
-        it 'does not return any body content' do
-            delete url
-            expect(body_json).to_not be_present
-        end
+        expect(payment.reload.value).to eq old_value
+      end
+
+      it "returns unprocessable entity status" do
+        patch url, params: payment_invalid_params
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
+  end
+
+  context "DELETE /payments/:id" do
+    let!(:payment) { create(:payment) }
+    let(:url) { "/payments/#{payment.id}" }
+
+    it "removes payment" do
+      expect do
+        delete url
+      end.to change(Payment, :count).by(-1)
+    end
+
+    it "returns no content status" do
+      delete url
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it "does not return any body content" do
+      delete url
+
+      expect(response.body).to be_blank
+    end
+  end
 end

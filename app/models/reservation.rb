@@ -1,4 +1,12 @@
 class Reservation < ApplicationRecord
-    validates_presence_of :plate, on: :create
-    validates_presence_of :status, on: :create
+  has_many :payments, dependent: :destroy
+
+  enum status: {
+    active: 0,
+    finished: 1,
+    cancelled: 2
+  }
+
+  validates :plate, presence: true
+  validates :status, presence: true
 end

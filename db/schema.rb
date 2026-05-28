@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_27_151845) do
+ActiveRecord::Schema.define(version: 2026_05_28_120000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "payments", force: :cascade do |t|
-    t.string "value"
+    t.decimal "value", precision: 10, scale: 2
     t.bigint "reservation_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2022_09_27_151845) do
 
   create_table "reservations", force: :cascade do |t|
     t.string "plate"
-    t.string "entry"
-    t.string "exit"
+    t.datetime "entry"
+    t.datetime "exit"
     t.integer "status"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
